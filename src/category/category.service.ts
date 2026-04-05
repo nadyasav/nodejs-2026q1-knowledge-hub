@@ -4,14 +4,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Category } from './category.entity';
-import { isUUID } from 'class-validator';
+import { validate as isUUID } from 'uuid';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { randomUUID } from 'crypto';
+import { randomUUID, UUID } from 'crypto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { ArticleService } from '../article/article.service';
 
 @Injectable()
 export class CategoryService {
   private categories: Map<string, Category> = new Map();
+
+  constructor(private readonly articleService: ArticleService) {}
 
   getAll(): Category[] {
     return Array.from(this.categories.values());
@@ -67,5 +70,6 @@ export class CategoryService {
     }
 
     this.categories.delete(id);
+    this.articleService.resetCategoryId(id as UUID);
   }
 }

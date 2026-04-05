@@ -6,13 +6,16 @@ import {
 } from '@nestjs/common';
 import { User, UserRole } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { randomUUID } from 'crypto';
+import { randomUUID, UUID } from 'crypto';
 import { validate as isUUID } from 'uuid';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { ArticleService } from '../article/article.service';
 
 @Injectable()
 export class UserService {
   private users: Map<string, User> = new Map();
+
+  constructor(private readonly articleService: ArticleService) {}
 
   getAll(): Omit<User, 'password'>[] {
     return Array.from(this.users.values()).map(
@@ -80,5 +83,6 @@ export class UserService {
     }
 
     this.users.delete(id);
+    this.articleService.resetAuthorId(id as UUID);
   }
 }
